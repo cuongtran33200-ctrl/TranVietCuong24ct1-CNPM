@@ -5,7 +5,7 @@ import qrcode
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
@@ -276,10 +276,19 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, f"Chào mừng {user.username} đến với SBCB!")
-            return redirect("shop:product_list")
+            try:
+                with transaction.atomic():
+                    user = form.save()
+            except IntegrityError:
+                form.add_error(
+                    None,
+                    "Tên đăng nhập hoặc email vừa được đăng ký. "
+                    "Vui lòng kiểm tra lại thông tin.",
+                )
+            else:
+                login(request, user)
+                messages.success(request, f"Chào mừng {user.username} đến với SBCB!")
+                return redirect("shop:product_list")
     else:
         form = RegisterForm()
     return render(request, "registration/register.html", {"form": form})

@@ -2125,3 +2125,64 @@ body {
 @media (max-width: 400px) {
     .sbcb-cat-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+.ui-icon {
+    width: 1.1em;
+    height: 1.1em;
+    flex: 0 0 auto;
+    display: inline-block;
+    vertical-align: -0.16em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.fpt-action-icon .ui-icon { width: 1.45rem; height: 1.45rem; }
+.commitment-icon .ui-icon { width: 1.75rem; height: 1.75rem; }
+.mini-tag .ui-icon { width: 1rem; height: 1rem; margin-right: 3px; }
+.flame-icon .ui-icon { width: 1.8rem; height: 1.8rem; }
+.sbcb-prod-img-placeholder .ui-icon-product { width: 3rem; height: 3rem; color: #8a93a2; stroke-width: 1.4; }
+.sbcb-btn-cart .ui-icon { margin-right: 5px; }
+.sbcb-brand-mark { color: #30343b; font-weight: 800; font-size: 1.6rem; }
+.sbcb-no-rating { color: #9299a4; font-weight: 500; }
+
+.fpt-topbar .ui-icon { vertical-align: -0.2em; }
+.fpt-nav-link > .ui-icon { color: var(--sbcb-red); }
+
+@media (max-width: 767.98px) {
+    .fpt-topbar { font-size: 0.72rem; }
+    .fpt-topbar .container { gap: 8px; }
+    .fpt-header > .container > .d-flex { flex-wrap: wrap; row-gap: 8px !important; }
+    .fpt-header .navbar-brand { margin-right: 0 !important; }
+    .sbcb-logo { width: 54px; height: 44px; }
+    .fpt-header .fpt-search-box { min-width: 0; }
+    .fpt-header .container > .d-flex > .d-flex.flex-column { order: 3; flex-basis: 100%; max-width: none !important; }
+    .fpt-header .fpt-header-action { padding: 5px 7px; }
+    .fpt-nav-link { padding: 10px 12px; font-size: 0.76rem; }
+    .fpt-commitments .commitment-item { min-height: 68px; padding: 9px 10px; gap: 8px; }
+    .commitment-icon .ui-icon { width: 1.35rem; height: 1.35rem; }
+    .commitment-text h6 { font-size: 0.75rem; }
+    .commitment-text p { font-size: 0.66rem; }
+    .sbcb-popular-cats, .sbcb-best-sellers { padding: 24px 0; }
+    .sbcb-cat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+    .sbcb-cat-card { min-width: 0; padding: 12px 5px; border-radius: 12px; }
+    .sbcb-cat-icon-wrap { width: 46px; height: 46px; }
+    .sbcb-cat-name { font-size: 0.7rem; }
+    .sbcb-product-card { border-radius: 12px; }
+    .sbcb-prod-info { padding: 9px; }
+    .sbcb-prod-img-link { aspect-ratio: 1 / 0.9; }
+    .sbcb-prod-name { min-height: 2.7em; }
+    .sbcb-price-main { font-size: 0.9rem; }
+    .sbcb-btn-cart { padding: 7px 4px; font-size: 0.72rem; }
+}
+
+@media (max-width: 380px) {
+    .fpt-topbar .d-flex.gap-3 { gap: 6px !important; }
+    .fpt-header .container { padding-left: 10px; padding-right: 10px; }
+    .sbcb-logo { width: 46px; }
+    .fpt-header-action { padding: 4px !important; }
+    .sbcb-cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .sbcb-price-main { font-size: 0.82rem; }
+}

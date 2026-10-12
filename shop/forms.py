@@ -18,10 +18,19 @@ class RegisterForm(UserCreationForm):
             field.widget.attrs["class"] = "form-control"
         self.fields["username"].label = "Tên đăng nhập"
         self.fields["username"].widget.attrs.update(
-            {"placeholder": "Nhập tên đăng nhập", "autofocus": True}
+            {
+                "placeholder": "Nhập tên đăng nhập",
+                "autofocus": True,
+                "autocomplete": "username",
+                "maxlength": 150,
+            }
         )
         self.fields["email"].widget.attrs.update(
-            {"placeholder": "Nhập địa chỉ Gmail hoặc email", "autocomplete": "email"}
+            {
+                "placeholder": "Nhập địa chỉ Gmail hoặc email",
+                "autocomplete": "email",
+                "inputmode": "email",
+            }
         )
         self.fields["password1"].label = "Mật khẩu"
         self.fields["password1"].widget.attrs.update(
@@ -37,7 +46,9 @@ class RegisterForm(UserCreationForm):
         )
 
     def clean_username(self):
-        username = self.cleaned_data["username"]
+        username = self.cleaned_data["username"].strip()
+        if not username:
+            raise forms.ValidationError("Vui lòng nhập tên đăng nhập.")
         if User.objects.filter(username__iexact=username).exists():
             raise forms.ValidationError(
                 "Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác."
