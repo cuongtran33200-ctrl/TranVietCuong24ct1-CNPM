@@ -1040,4 +1040,91 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
 
 </script>
 
+{% if not category and not query and not show_all %}
+<canvas id="sbcbFireworks" class="sbcb-fireworks" aria-hidden="true"></canvas>
+<script>
+(function () {
+    var canvas = document.getElementById('sbcbFireworks');
+    if (!canvas || !canvas.getContext) {
+        return;
+    }
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        canvas.remove();
+        return;
+    }
+
+    var ctx = canvas.getContext('2d');
+    var colors = ['#c8102e', '#ffb800', '#1769e0', '#ffffff', '#ff7a18', '#2ecc71'];
+    var particles = [];
+    var DURATION = 6000;
+    var start = performance.now();
+    var lastBurst = 0;
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    function burst(x, y) {
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        var count = 40 + Math.floor(Math.random() * 25);
+        for (var i = 0; i < count; i++) {
+            var angle = (Math.PI * 2 * i) / count;
+            var speed = 2 + Math.random() * 3;
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 1,
+                color: color
+            });
+        }
+    }
+
+    function frame(now) {
+        var elapsed = now - start;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (elapsed < DURATION && now - lastBurst > 700) {
+            burst(
+                canvas.width * (0.15 + Math.random() * 0.7),
+                canvas.height * (0.12 + Math.random() * 0.4)
+            );
+            lastBurst = now;
+        }
+
+        particles = particles.filter(function (p) { return p.life > 0; });
+        particles.forEach(function (p) {
+            p.vx *= 0.97;
+            p.vy *= 0.97;
+            p.vy += 0.035;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.016;
+            ctx.globalAlpha = Math.max(p.life, 0);
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
+            ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+
+        if (elapsed < DURATION || particles.length > 0) {
+            requestAnimationFrame(frame);
+        } else {
+            canvas.remove();
+        }
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    requestAnimationFrame(function (now) {
+        start = now;
+        frame(now);
+    });
+})();
+</script>
+{% endif %}
+
 {% endblock %}

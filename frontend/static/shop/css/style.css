@@ -2148,6 +2148,16 @@ body {
 .sbcb-brand-mark { color: #30343b; font-weight: 800; font-size: 1.6rem; }
 .sbcb-no-rating { color: #9299a4; font-weight: 500; }
 
+/* ---------- PHÁO HOA TRANG CHỦ ---------- */
+.sbcb-fireworks {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1040;
+}
+
 .fpt-topbar .ui-icon { vertical-align: -0.2em; }
 .fpt-nav-link > .ui-icon { color: var(--sbcb-red); }
 
