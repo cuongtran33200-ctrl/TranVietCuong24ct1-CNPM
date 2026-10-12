@@ -2,6 +2,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from . import admin_views, staff_views, views
+from .forms import LoginForm
 
 app_name = "shop"
 
@@ -26,7 +27,14 @@ urlpatterns = [
     path("ho-tro/", views.support_create, name="support_list"),
 
     path("dang-ky/", views.register, name="register"),
-    path("dang-nhap/", auth_views.LoginView.as_view(template_name="registration/login.html"), name="login"),
+    path(
+        "dang-nhap/",
+        auth_views.LoginView.as_view(
+            template_name="registration/login.html",
+            authentication_form=LoginForm,
+        ),
+        name="login",
+    ),
     path("dang-xuat/", auth_views.LogoutView.as_view(next_page="shop:product_list"), name="logout"),
 
     # ---- Nhân viên ----

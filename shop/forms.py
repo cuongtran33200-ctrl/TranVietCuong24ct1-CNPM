@@ -1,12 +1,12 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import Order, Profile, Review, SupportRequest
 
 
 class RegisterForm(UserCreationForm):
-    email = forms.EmailField(required=True, label="Email")
+    email = forms.EmailField(required=True, label="Gmail / Email")
 
     class Meta:
         model = User
@@ -16,6 +16,59 @@ class RegisterForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
+        self.fields["username"].label = "Tên đăng nhập"
+        self.fields["username"].widget.attrs.update(
+            {"placeholder": "Nhập tên đăng nhập", "autofocus": True}
+        )
+        self.fields["email"].widget.attrs.update(
+            {"placeholder": "Nhập địa chỉ Gmail hoặc email", "autocomplete": "email"}
+        )
+        self.fields["password1"].label = "Mật khẩu"
+        self.fields["password1"].widget.attrs.update(
+            {"placeholder": "Nhập mật khẩu", "autocomplete": "new-password"}
+        )
+        self.fields["password2"].label = "Nhập lại mật khẩu"
+        self.fields["password2"].widget.attrs.update(
+            {"placeholder": "Nhập lại mật khẩu", "autocomplete": "new-password"}
+        )
+        self.fields["password1"].help_text = (
+            "Mật khẩu cần ít nhất 8 ký tự, không quá phổ biến, không chỉ gồm số "
+            "và không quá giống thông tin tài khoản."
+        )
+
+    def clean_username(self):
+        username = self.cleaned_data["username"]
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError(
+                "Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác."
+            )
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError(
+                "Email này đã được sử dụng. Vui lòng nhập email khác."
+            )
+        return email
+
+
+class LoginForm(AuthenticationForm):
+    error_messages = {
+        "invalid_login": "Tên đăng nhập hoặc mật khẩu không đúng.",
+        "inactive": "Tài khoản này hiện không hoạt động.",
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].label = "Tên đăng nhập"
+        self.fields["username"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Nhập tên đăng nhập"}
+        )
+        self.fields["password"].label = "Mật khẩu"
+        self.fields["password"].widget.attrs.update(
+            {"class": "form-control", "placeholder": "Nhập mật khẩu"}
+        )
 
 
 class AddToCartForm(forms.Form):
