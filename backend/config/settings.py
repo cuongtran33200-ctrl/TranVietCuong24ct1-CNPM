@@ -176,6 +176,7 @@ MEDIA_ROOT = PROJECT_ROOT / 'media'
 # =========================
 # DEFAULT PRIMARY KEY
 # =========================
+LOGIN_URL = 'shop:login'
 LOGIN_REDIRECT_URL = '/ho-so/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

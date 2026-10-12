@@ -1,7 +1,7 @@
 {% extends "shop/base.html" %}`n{% load shop_filters %}
 {% block title %}Thống kê doanh thu - SBCB{% endblock %}
 {% block content %}
-<h3 class="mb-3">💰 Thống kê doanh thu</h3>
+<h3 class="mb-3"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M9 9.5c0-1 1.3-1.5 3-1.5s3 .5 3 1.5-1.3 1.5-3 2-3 1-3 2 1.3 1.5 3 1.5 3-.5 3-1.5"/></svg> Thống kê doanh thu</h3>
 <p class="fs-4">Tổng doanh thu (không tính đơn đã huỷ): <span class="price-tag">{{ total_revenue|vnd }}₫</span></p>
 
 <div class="table-responsive">

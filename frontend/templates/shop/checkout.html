@@ -6,7 +6,7 @@
 <!-- Quy trình mua hàng 3 bước -->
 <div class="fpt-step-indicator">
     <div class="step-pill">
-        <span class="step-num">✔</span>
+        <span class="step-num"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>
         <span>Giỏ hàng</span>
     </div>
     <span class="text-danger">───</span>
@@ -25,7 +25,7 @@
     <!-- Cột trái: Form nhập thông tin khách hàng -->
     <div class="col-lg-7">
         <div class="fpt-cart-card">
-            <h5 class="fw-bold mb-3 text-danger border-bottom pb-2">📍 THÔNG TIN GIAO HÀNG & NGƯỜI NHẬN</h5>
+            <h5 class="fw-bold mb-3 text-danger border-bottom pb-2"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22s-7-6-7-12a7 7 0 0 1 14 0c0 6-7 12-7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg> THÔNG TIN GIAO HÀNG & NGƯỜI NHẬN</h5>
             <form method="post">
                 {% csrf_token %}
                 <div class="mb-3">
@@ -48,7 +48,7 @@
                 <!-- QR Thanh toán nổi bật -->
                 <div class="qr-checkout-block">
                     <div class="qr-checkout-header">
-                        <span class="qr-icon">▦</span>
+                        <span class="qr-icon"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h6v6h-6z"/></svg></span>
                         <div>
                             <div class="fw-bold">QUÉT MÃ QR — XEM SỐ TIỀN ĐƠN HÀNG</div>
                             <div class="small text-muted mt-1">Mã QR chỉ hiển thị thông tin đơn hàng và số tiền tương ứng.<br>SBCB Shop <strong>không tự động nhận tiền</strong> qua mã QR này.</div>
@@ -60,7 +60,7 @@
                         <div class="qr-amount-value">{{ cart.get_total_price|vnd }}₫</div>
                     </div>
                     <div class="qr-note-box">
-                        ℹ️ Nhân viên SBCB Shop sẽ liên hệ xác nhận đơn trong vòng <strong>10 phút</strong> và hướng dẫn thanh toán cụ thể.
+                        <svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg> Nhân viên SBCB Shop sẽ liên hệ xác nhận đơn trong vòng <strong>10 phút</strong> và hướng dẫn thanh toán cụ thể.
                     </div>
                 </div>
 
@@ -75,7 +75,7 @@
     <!-- Cột phải: Chi tiết đơn hàng tóm tắt -->
     <div class="col-lg-5">
         <div class="fpt-cart-card">
-            <h5 class="fw-bold mb-3 border-bottom pb-2">📦 ĐƠN HÀNG CỦA BẠN ({{ cart|length }} món)</h5>
+            <h5 class="fw-bold mb-3 border-bottom pb-2"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 7 9-4 9 4v10l-9 4-9-4V7Zm0 0 9 4 9-4m-9 4v10"/></svg> ĐƠN HÀNG CỦA BẠN ({{ cart|length }} món)</h5>
             <ul class="list-group list-group-flush mb-3">
                 {% for item in cart %}
                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
@@ -105,10 +105,10 @@
             </div>
 
             <div class="p-3 bg-light rounded small text-secondary">
-                <div class="fw-bold text-danger mb-1">🛡️ CAM KẾT SBCB SHOP</div>
-                <div>✔ 100% Sản phẩm chính hãng chưa kích hoạt</div>
-                <div>✔ Miễn phí đổi mới trong 30 ngày nếu lỗi kỹ thuật</div>
-                <div>✔ Hỗ trợ giao hàng siêu tốc chỉ 2 giờ nội thành</div>
+                <div class="fw-bold text-danger mb-1"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/></svg> CAM KẾT SBCB SHOP</div>
+                <div><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> 100% Sản phẩm chính hãng chưa kích hoạt</div>
+                <div><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Miễn phí đổi mới trong 30 ngày nếu lỗi kỹ thuật</div>
+                <div><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg> Hỗ trợ giao hàng siêu tốc chỉ 2 giờ nội thành</div>
             </div>
         </div>
     </div>

@@ -1,7 +1,7 @@
 {% extends "shop/base.html" %}`n{% load shop_filters %}
 {% block title %}Quản lý đơn hàng - SBCB{% endblock %}
 {% block content %}
-<h3 class="mb-3">👨‍💼 Danh sách đơn hàng</h3>
+<h3 class="mb-3"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> Danh sách đơn hàng</h3>
 
 <div class="d-flex flex-wrap gap-2 mb-3">
     <a href="{% url 'shop:staff_order_list' %}" class="btn btn-sm btn-outline-primary {% if not current_status %}active{% endif %}">Tất cả</a>

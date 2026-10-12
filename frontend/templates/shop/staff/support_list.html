@@ -1,7 +1,7 @@
 {% extends "shop/base.html" %}
 {% block title %}Yêu cầu hỗ trợ - SBCB{% endblock %}
 {% block content %}
-<h3 class="mb-3">💬 Yêu cầu hỗ trợ từ khách hàng</h3>
+<h3 class="mb-3"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l1.5-4A8.5 8.5 0 1 1 21 11.5Z"/></svg> Yêu cầu hỗ trợ từ khách hàng</h3>
 
 <div class="mb-3">
     <a href="{% url 'shop:staff_support_list' %}" class="btn btn-sm btn-outline-primary {% if not only_open %}active{% endif %}">Tất cả</a>

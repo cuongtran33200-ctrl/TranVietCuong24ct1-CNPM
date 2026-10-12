@@ -1,11 +1,11 @@
 {% extends "shop/base.html" %}`n{% load shop_filters %}
 {% block title %}Quản lý kho - SBCB{% endblock %}
 {% block content %}
-<h3 class="mb-3">📦 Quản lý kho</h3>
+<h3 class="mb-3"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m3 7 9-4 9 4v10l-9 4-9-4V7Zm0 0 9 4 9-4m-9 4v10"/></svg> Quản lý kho</h3>
 
 <div class="mb-3">
     <a href="{% url 'shop:staff_inventory' %}" class="btn btn-sm btn-outline-primary {% if not only_low %}active{% endif %}">Tất cả sản phẩm</a>
-    <a href="?low=1" class="btn btn-sm btn-outline-danger {% if only_low %}active{% endif %}">⚠ Sắp hết / hết hàng</a>
+    <a href="?low=1" class="btn btn-sm btn-outline-danger {% if only_low %}active{% endif %}"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 2 21h20L12 3Zm0 6v6m0 3h.01"/></svg> Sắp hết / hết hàng</a>
 </div>
 
 <div class="table-responsive">

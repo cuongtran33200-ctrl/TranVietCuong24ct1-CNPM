@@ -4,7 +4,7 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="bg-white rounded shadow-sm p-4">
-            <h3 class="mb-4">👤 Hồ sơ cá nhân</h3>
+            <h3 class="mb-4"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> Hồ sơ cá nhân</h3>
             <p class="text-muted">Tài khoản: <strong>{{ request.user.username }}</strong> · Vai trò: <strong>{{ request.user.profile.get_role_display }}</strong></p>
             <form method="post">
                 {% csrf_token %}

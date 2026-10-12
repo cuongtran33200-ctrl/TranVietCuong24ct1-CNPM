@@ -16,6 +16,10 @@ from .forms import AddToCartForm, CheckoutForm, ProfileForm, RegisterForm, Revie
 from .models import Category, Order, OrderItem, Product, Review, SupportRequest
 
 
+class CheckoutError(Exception):
+    """Lỗi nghiệp vụ khi đặt hàng (tồn kho không đủ, sản phẩm ngừng bán...)."""
+
+
 def build_qr_data_uri(amount, order_id=None):
     order_label = f"DON HANG #{order_id}" if order_id else "DON HANG MOI"
     qr_content = f"SBCB SHOP | {order_label} | SO TIEN {amount:.0f} VND"
@@ -226,17 +230,42 @@ def checkout(request):
     if request.method == "POST":
         form = CheckoutForm(request.POST)
         if form.is_valid():
-            with transaction.atomic():
-                order = form.save(commit=False)
-                order.user = request.user
-                order.save()
-                for item in cart:
-                    OrderItem.objects.create(
-                        order=order,
-                        product=item["product"],
-                        price=item["price"],
-                        quantity=item["quantity"],
+            try:
+                with transaction.atomic():
+                    order = form.save(commit=False)
+                    order.user = request.user
+                    order.save()
+
+                    product_ids = [int(pid) for pid in cart.cart.keys()]
+                    products = Product.objects.select_for_update().filter(
+                        id__in=product_ids, is_active=True
                     )
+                    products_by_id = {p.id: p for p in products}
+
+                    for pid, item in cart.cart.items():
+                        product = products_by_id.get(int(pid))
+                        quantity = int(item["quantity"])
+                        if product is None:
+                            raise CheckoutError(
+                                "Có sản phẩm trong giỏ không còn được bán. Vui lòng cập nhật giỏ hàng."
+                            )
+                        if quantity < 1 or product.stock < quantity:
+                            raise CheckoutError(
+                                f"\"{product.name}\" chỉ còn {product.stock} sản phẩm trong kho."
+                            )
+
+                        product.stock -= quantity
+                        product.save(update_fields=["stock", "updated_at"])
+                        OrderItem.objects.create(
+                            order=order,
+                            product=product,
+                            price=product.price,
+                            quantity=quantity,
+                        )
+            except CheckoutError as exc:
+                messages.error(request, str(exc))
+                return redirect("shop:cart_detail")
+
             cart.clear()
             messages.success(
                 request,
