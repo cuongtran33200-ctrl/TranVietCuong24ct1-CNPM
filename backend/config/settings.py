@@ -7,10 +7,13 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+# BASE_DIR: thư mục backend (chứa manage.py, config/, home/, shop/)
 BASE_DIR = Path(__file__).resolve().parent.parent
+# PROJECT_ROOT: thư mục gốc dự án (chứa frontend/, .env, ca.pem, db, media)
+PROJECT_ROOT = BASE_DIR.parent
 
 # Đọc file .env
-load_dotenv(BASE_DIR / ".env")
+load_dotenv(PROJECT_ROOT / ".env")
 
 # Cloudinary
 CLOUDINARY_URL = os.environ.get("CLOUDINARY_URL")
@@ -75,7 +78,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'frontend' / 'templates'],
+        'DIRS': [PROJECT_ROOT / 'frontend' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -107,7 +110,7 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', ''),
         'OPTIONS': {
             'ssl': {
-                'ca': BASE_DIR / 'ca.pem',
+                'ca': PROJECT_ROOT / 'ca.pem',
             },
         },
     },
@@ -116,7 +119,7 @@ DATABASES = {
     # SQLite dùng làm dữ liệu backup/local
     'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': PROJECT_ROOT / 'db.sqlite3',
     },
 }
 
@@ -157,8 +160,8 @@ USE_TZ = True
 # STATIC FILES
 # =========================
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'frontend' / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [PROJECT_ROOT / 'frontend' / 'static']
+STATIC_ROOT = PROJECT_ROOT / 'staticfiles'
 
 
 # =========================
@@ -167,7 +170,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = PROJECT_ROOT / 'media'
 
 
 # =========================

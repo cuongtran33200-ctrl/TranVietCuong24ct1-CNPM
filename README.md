@@ -125,42 +125,41 @@ Order
 ```text
 24CT1-TRANVIETCUONG/
 │
-├── manage.py
 ├── requirements.txt
 ├── README.md
 ├── ca.pem
 │
-├── config/                         # Backend: Django settings and root URLs
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-│
-├── home/                           # Backend app: about/home endpoint
-│   ├── admin.py
-│   ├── apps.py
-│   ├── models.py
-│   ├── views.py
-│   ├── urls.py
-│   ├── tests.py
-│   └── migrations/
-│
-├── shop/                           # Backend app: commerce and business rules
-│   ├── apps.py
-│   ├── models.py                   # Database entities
-│   ├── views.py                    # Customer request handlers
-│   ├── staff_views.py              # Staff workflows
-│   ├── admin_views.py              # Admin dashboard workflows
-│   ├── forms.py                    # Input validation/forms
-│   ├── urls.py                     # Shop routes
-│   ├── cart.py                     # Session cart logic
-│   ├── decorators.py               # Role access control
-│   ├── context_processors.py       # Shared template data
-│   ├── admin.py                    # Django admin registrations
-│   ├── tests.py                    # Backend tests
-│   ├── migrations/                 # Database schema history
-│   ├── management/commands/        # Seed/admin management commands
-│   └── templatetags/               # Presentation filters
+├── backend/                        # BACKEND: toàn bộ mã Python/Django
+│   ├── manage.py
+│   ├── config/                     # Settings, root URLs, WSGI/ASGI
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   ├── asgi.py
+│   │   └── wsgi.py
+│   ├── home/                       # App trang /about/
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   ├── urls.py
+│   │   ├── tests.py
+│   │   └── migrations/
+│   └── shop/                       # App nghiệp vụ: sản phẩm, giỏ, đơn, nhân viên, admin
+│       ├── apps.py
+│       ├── models.py               # Database entities
+│       ├── views.py                # Customer request handlers
+│       ├── staff_views.py          # Staff workflows
+│       ├── admin_views.py          # Admin dashboard workflows
+│       ├── forms.py                # Input validation/forms
+│       ├── urls.py                 # Shop routes
+│       ├── cart.py                 # Session cart logic
+│       ├── decorators.py           # Role access control
+│       ├── context_processors.py   # Shared template data
+│       ├── admin.py                # Django admin registrations
+│       ├── tests.py                # Backend tests
+│       ├── migrations/             # Database schema history
+│       ├── management/commands/    # Seed/admin management commands
+│       └── templatetags/           # Presentation filters
 │
 ├── frontend/                       # FRONTEND: giao diện người dùng
 │   ├── templates/                  # HTML (Django templates)
@@ -175,9 +174,9 @@ Order
 
 Đây là ứng dụng Django render giao diện phía server, chưa tách thành frontend React/Vue và backend API riêng. Để tìm nhanh:
 
-- **Frontend:** `frontend/templates/` (HTML) và `frontend/static/` (CSS/hình ảnh). Đường dẫn được khai báo trong `config/settings.py` (`TEMPLATES.DIRS`, `STATICFILES_DIRS`).
-- **Backend:** `config/`, `home/` và các file Python xử lý nghiệp vụ trong `shop/` như `views.py`, `models.py`, `forms.py`, `cart.py`, `staff_views.py` và `admin_views.py`.
-- **Điểm nối:** `shop/urls.py` ánh xạ URL vào backend views; views lấy dữ liệu rồi render template tương ứng.
+- **Frontend:** `frontend/templates/` (HTML) và `frontend/static/` (CSS/hình ảnh). Đường dẫn được khai báo trong `backend/config/settings.py` (`TEMPLATES.DIRS`, `STATICFILES_DIRS`).
+- **Backend:** toàn bộ thư mục `backend/`, gồm `config/`, `home/` và `shop/` như `views.py`, `models.py`, `forms.py`, `cart.py`, `staff_views.py` và `admin_views.py`.
+- **Điểm nối:** `backend/shop/urls.py` ánh xạ URL vào backend views; views lấy dữ liệu rồi render template tương ứng.
 - **Database:** model/migration nằm ở backend; không đặt logic nghiệp vụ trong template hoặc CSS.
 
 Giao diện nằm trong `frontend/`, còn code Python xử lý nghiệp vụ nằm trong `config/`, `home/` và `shop/`. Đường dẫn template/static đã được khai báo lại trong `config/settings.py`.
@@ -337,24 +336,28 @@ CLOUDINARY_URL=your_cloudinary_url
 ### 5. Chạy migration
 
 ```bash
+cd backend
 python manage.py migrate
 ```
 
 ### 6. Tạo dữ liệu mẫu
 
 ```bash
+cd backend
 python manage.py seed_data
 ```
 
 ### 7. Tạo tài khoản Admin
 
 ```bash
+cd backend
 python manage.py create_admin
 ```
 
 ### 8. Chạy server
 
 ```bash
+cd backend
 python manage.py runserver
 ```
 
