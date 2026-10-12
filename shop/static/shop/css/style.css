@@ -411,6 +411,21 @@ a:hover {
     margin-right: 8px;
 }
 
+.fpt-cat-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.fpt-cat-thumb {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #fff;
+}
+
 .fpt-cat-item .chevron {
     font-size: 0.85rem;
     color: #cbd5e1;
@@ -1543,4 +1558,570 @@ form textarea:focus {
 @media (max-width: 575.98px) {
     .qr-checkout-img { width: 160px; height: 160px; }
     .qr-amount-value { font-size: 1.4rem; }
+}
+
+/* ==========================================
+   SHOP SBCB - GIAO DIEN NANG CAP
+   Phong cach cua hang cong nghe hien dai
+   ========================================== */
+
+:root {
+    --sbcb-red: #c8102e;
+    --sbcb-red-dark: #a30d24;
+    --sbcb-blue: #1769e0;
+    --sbcb-bg: #f5f6f8;
+    --sbcb-text: #20242b;
+    --sbcb-border: #e8ebf0;
+    --sbcb-shadow: 0 8px 24px rgba(20, 30, 50, 0.08);
+}
+
+body {
+    background: var(--sbcb-bg);
+    color: var(--sbcb-text);
+}
+
+/* Header */
+.fpt-header {
+    background: linear-gradient(
+        110deg,
+        var(--sbcb-red-dark),
+        var(--sbcb-red) 65%,
+        #e52b43
+    );
+    box-shadow: 0 4px 18px rgba(163, 13, 36, 0.2);
+}
+
+.fpt-topbar {
+    background: #171a21;
+}
+
+/* Khoang cach trang chu */
+.fpt-hero-wrap {
+    margin-top: 22px;
+    margin-bottom: 28px;
+}
+
+.fpt-category-sidebar {
+    background: #fff;
+    border: 1px solid var(--sbcb-border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--sbcb-shadow);
+}
+
+.sidebar-heading {
+    padding: 16px 18px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.fpt-cat-item {
+    padding: 12px 16px;
+    transition: background 0.2s ease, padding 0.2s ease;
+}
+
+.fpt-cat-item:hover {
+    background: #fff1f3;
+    padding-left: 21px;
+    color: var(--sbcb-red);
+}
+
+/* Banner */
+.fpt-carousel {
+    overflow: hidden;
+    border-radius: 16px;
+    box-shadow: var(--sbcb-shadow);
+}
+
+.fpt-banner-img {
+    height: 350px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.fpt-carousel:hover .fpt-banner-img {
+    transform: scale(1.015);
+}
+
+.fpt-mini-banner {
+    border-radius: 14px;
+}
+
+/* Flash Sale */
+.fpt-flash-sale {
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 10px 28px rgba(200, 16, 46, 0.16);
+}
+
+.flash-sale-title h3 {
+    letter-spacing: 0.2px;
+}
+
+/* Tieu de tung khu vuc */
+.fpt-section-header {
+    margin-top: 28px;
+    margin-bottom: 20px;
+    gap: 14px;
+}
+
+.fpt-section-title {
+    font-size: clamp(1.05rem, 2vw, 1.4rem);
+    line-height: 1.4;
+}
+
+/* The san pham */
+.fpt-product-card {
+    height: 100%;
+    background: #fff;
+    border: 1px solid var(--sbcb-border);
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 3px 12px rgba(20, 30, 50, 0.035);
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
+}
+
+.fpt-product-card:hover {
+    transform: translateY(-5px);
+    border-color: #f0b9c2;
+    box-shadow: 0 14px 32px rgba(20, 30, 50, 0.12);
+}
+
+.fpt-product-img-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 190px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #fff, #f7f8fb);
+}
+
+.fpt-product-img-box img {
+    width: 100%;
+    max-height: 210px;
+    object-fit: contain;
+    transition: transform 0.25s ease;
+}
+
+.fpt-product-card:hover .fpt-product-img-box img {
+    transform: scale(1.045);
+}
+
+.fpt-product-title {
+    display: -webkit-box;
+    min-height: 44px;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    color: var(--sbcb-text);
+    font-size: 0.93rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.fpt-product-title:hover {
+    color: var(--sbcb-red);
+}
+
+.fpt-spec-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.spec-pill {
+    border-radius: 6px;
+    background: #f2f5fa;
+    color: #535d6c;
+    padding: 4px 7px;
+    font-size: 0.7rem;
+}
+
+.fpt-price-wrap {
+    margin-top: 12px;
+}
+
+.fpt-price-main {
+    color: var(--sbcb-red);
+    font-size: 1.15rem;
+    font-weight: 900;
+}
+
+.fpt-price-old {
+    margin-left: 8px;
+    color: #8b929d;
+    font-size: 0.8rem;
+    text-decoration: line-through;
+}
+
+.fpt-promo-tag {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    background: #fff5e8;
+    color: #89510b;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.btn-fpt-buy {
+    border-radius: 9px;
+    background: var(--sbcb-red);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-fpt-buy:hover {
+    background: var(--sbcb-red-dark);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.brand-chip {
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.brand-chip:hover,
+.brand-chip.active {
+    border-color: var(--sbcb-red);
+    background: var(--sbcb-red);
+    color: #fff;
+}
+
+/* Dien thoai va tablet */
+@media (max-width: 767.98px) {
+    .fpt-hero-wrap {
+        margin-top: 12px;
+        margin-bottom: 20px;
+    }
+
+    .fpt-banner-img {
+        height: 210px;
+    }
+
+    .fpt-flash-sale {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .flash-sale-title h3 {
+        font-size: 1.05rem;
+    }
+
+    .fpt-countdown .timer-label {
+        font-size: 0.7rem;
+    }
+
+    .fpt-section-header {
+        align-items: flex-start;
+    }
+
+    .fpt-product-card {
+        padding: 10px;
+        border-radius: 12px;
+    }
+
+    .fpt-product-img-box {
+        min-height: 140px;
+    }
+
+    .fpt-product-img-box img {
+        max-height: 150px;
+    }
+
+    .fpt-product-title {
+        font-size: 0.84rem;
+    }
+
+    .fpt-price-main {
+        font-size: 1rem;
+    }
+
+    .fpt-promo-tag {
+        font-size: 0.7rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fpt-product-card,
+    .fpt-product-img-box img,
+    .fpt-cat-item,
+    .fpt-banner-img {
+        transition: none;
+    }
+}
+
+
+/* ================================================================
+   SBCB SHOP — MODERN UI (Oct 2026)
+   Popular Categories + Best Sellers sections
+   ================================================================ */
+
+/* ---------- SECTION COMMON ---------- */
+.sbcb-popular-cats,
+.sbcb-best-sellers {
+    padding: 36px 0;
+    background: #fff;
+}
+
+.sbcb-popular-cats {
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+.sbcb-best-sellers {
+    border-top: 1px solid #eee;
+    padding-bottom: 48px;
+}
+
+.sbcb-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.sbcb-section-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    position: relative;
+    padding-bottom: 8px;
+}
+
+.sbcb-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 48px;
+    height: 3px;
+    background: #B71C1C;
+    border-radius: 2px;
+}
+
+.sbcb-view-all {
+    font-size: 0.88rem;
+    color: #B71C1C;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+.sbcb-view-all:hover { opacity: 0.75; color: #B71C1C; }
+
+
+/* ---------- POPULAR CATEGORIES GRID ---------- */
+.sbcb-cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 14px;
+}
+
+.sbcb-cat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1.5px solid #ececec;
+    border-radius: 14px;
+    padding: 18px 10px 14px;
+    text-decoration: none;
+    color: #222;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-align: center;
+}
+
+.sbcb-cat-card:hover {
+    border-color: #B71C1C;
+    background: #fff5f5;
+    color: #B71C1C;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(183,28,28,0.12);
+}
+
+.sbcb-cat-icon-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fff0f0, #ffe4e4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.sbcb-cat-card:hover .sbcb-cat-icon-wrap {
+    background: linear-gradient(135deg, #ffd6d6, #ffbbbb);
+}
+
+.sbcb-cat-emoji {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.sbcb-cat-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.sbcb-cat-name {
+    font-size: 0.80rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+
+/* ---------- BEST SELLERS PRODUCT CARDS ---------- */
+.sbcb-product-card {
+    background: #fff;
+    border: 1.5px solid #ececec;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.25s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.sbcb-product-card:hover {
+    border-color: #B71C1C;
+    box-shadow: 0 8px 28px rgba(183,28,28,0.13);
+    transform: translateY(-4px);
+}
+
+.sbcb-badge-sale {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #B71C1C;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    z-index: 2;
+    letter-spacing: 0.3px;
+}
+
+.sbcb-prod-img-link {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f5f5f7;
+}
+
+.sbcb-prod-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.sbcb-product-card:hover .sbcb-prod-img {
+    transform: scale(1.06);
+}
+
+.sbcb-prod-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    background: #f5f5f7;
+}
+
+.sbcb-prod-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.sbcb-prod-name {
+    font-size: 0.83rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-decoration: none;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.sbcb-prod-name:hover { color: #B71C1C; }
+
+.sbcb-prod-stars {
+    font-size: 0.78rem;
+    color: #f59e0b;
+}
+.sbcb-review-count { color: #9ca3af; font-size: 0.75rem; }
+
+.sbcb-prod-prices {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.sbcb-price-main {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #B71C1C;
+}
+
+.sbcb-price-old {
+    font-size: 0.78rem;
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.sbcb-btn-cart {
+    display: block;
+    margin-top: auto;
+    background: #B71C1C;
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.80rem;
+    font-weight: 600;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.sbcb-btn-cart:hover { background: #8f1111; color: #fff; }
+
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 576px) {
+    .sbcb-cat-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+    .sbcb-cat-icon-wrap { width: 48px; height: 48px; }
+    .sbcb-cat-emoji { font-size: 1.4rem; }
+    .sbcb-cat-name { font-size: 0.72rem; }
+    .sbcb-section-title { font-size: 1.1rem; }
+}
+
+@media (max-width: 400px) {
+    .sbcb-cat-grid { grid-template-columns: repeat(3, 1fr); }
 }

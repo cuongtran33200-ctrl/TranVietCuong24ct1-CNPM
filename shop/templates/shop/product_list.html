@@ -9,7 +9,7 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
 
 {% block content %}
 
-{% if not category and not query %}
+{% if not category and not query and not show_all %}
 
 <!-- HERO -->
 <section class="fpt-hero-wrap">
@@ -22,29 +22,19 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
                 <div class="sidebar-heading"> DANH MỤC SẢN PHẨM</div>
 
                 <a href="{% url 'shop:product_list' %}" class="fpt-cat-item active">
-                    <span>📱 Tất cả sản phẩm</span>
+                    <span class="fpt-cat-label">
+                        {% if all_products_image %}
+                            <img class="fpt-cat-thumb" src="{{ all_products_image }}" alt="">
+                        {% endif %}
+                        Tất cả sản phẩm
+                    </span>
                     <span class="chevron">›</span>
                 </a>
 
                 {% for c in categories %}
                 <a href="{{ c.get_absolute_url }}" class="fpt-cat-item">
-                    <span>
-                        <span class="cat-icon">
-                            {% if 'thoại' in c.name|lower or 'thoai' in c.name|lower or 'phone' in c.name|lower %}
-                                📱
-                            {% elif 'laptop' in c.name|lower %}
-                                💻
-                            {% elif 'tai nghe' in c.name|lower or 'nghe' in c.name|lower or 'airpod' in c.name|lower %}
-                                🎧
-                            {% elif 'sạc' in c.name|lower or 'phụ' in c.name|lower or 'sac' in c.name|lower %}
-                                🔌
-                            {% elif 'đồng hồ' in c.name|lower or 'đồng' in c.name|lower or 'watch' in c.name|lower %}
-                                ⌚
-                            {% else %}
-                                📦
-                            {% endif %}
-                        </span>
-
+                    <span class="fpt-cat-label">
+                        <img class="fpt-cat-thumb" src="{{ c.display_image }}" alt="">
                         {{ c.name }}
                     </span>
 
@@ -53,12 +43,22 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
                 {% endfor %}
 
                 <a href="{% url 'shop:product_list' %}?q=Apple" class="fpt-cat-item">
-                    <span>🍎 Chuyên trang Apple</span>
+                    <span class="fpt-cat-label">
+                        {% if apple_image %}
+                            <img class="fpt-cat-thumb" src="{{ apple_image }}" alt="">
+                        {% endif %}
+                        Chuyên trang Apple
+                    </span>
                     <span class="chevron">›</span>
                 </a>
 
                 <a href="{% url 'shop:product_list' %}?q=Samsung" class="fpt-cat-item">
-                    <span>📱 Chuyên trang Samsung</span>
+                    <span class="fpt-cat-label">
+                        {% if samsung_image %}
+                            <img class="fpt-cat-thumb" src="{{ samsung_image }}" alt="">
+                        {% endif %}
+                        Chuyên trang Samsung
+                    </span>
                     <span class="chevron">›</span>
                 </a>
 
@@ -337,9 +337,107 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
 {% endif %}
 
 
+<!-- ============================================================ -->
+<!-- POPULAR CATEGORIES -->
+<!-- ============================================================ -->
+{% if not category and not query and not show_all %}
+<section class="sbcb-popular-cats">
+  <div class="container">
+    <div class="sbcb-section-head">
+      <h2 class="sbcb-section-title">Danh Mục Phổ Biến</h2>
+      <a href="{% url 'shop:product_list' %}?all=1" class="sbcb-view-all">Xem tất cả →</a>
+    </div>
+    <div class="sbcb-cat-grid">
+      {% for c in categories %}
+      <a href="{{ c.get_absolute_url }}" class="sbcb-cat-card">
+        <div class="sbcb-cat-icon-wrap">
+          <img class="sbcb-cat-image" src="{{ c.display_image }}" alt="{{ c.name }}" loading="lazy">
+        </div>
+        <span class="sbcb-cat-name">{{ c.name }}</span>
+      </a>
+      {% endfor %}
+      <a href="{% url 'shop:product_list' %}?q=Apple" class="sbcb-cat-card">
+        <div class="sbcb-cat-icon-wrap">
+          {% if apple_image %}
+            <img class="sbcb-cat-image" src="{{ apple_image }}" alt="Apple" loading="lazy">
+          {% else %}
+            <span class="sbcb-cat-emoji">🍎</span>
+          {% endif %}
+        </div>
+        <span class="sbcb-cat-name">Apple</span>
+      </a>
+      <a href="{% url 'shop:product_list' %}?q=Samsung" class="sbcb-cat-card">
+        <div class="sbcb-cat-icon-wrap">
+          {% if samsung_image %}
+            <img class="sbcb-cat-image" src="{{ samsung_image }}" alt="Samsung" loading="lazy">
+          {% else %}
+            <span class="sbcb-cat-emoji">📲</span>
+          {% endif %}
+        </div>
+        <span class="sbcb-cat-name">Samsung</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- BEST SELLERS -->
+<!-- ============================================================ -->
+<section class="sbcb-best-sellers">
+  <div class="container">
+    <div class="sbcb-section-head">
+      <h2 class="sbcb-section-title">🏆 Best Sellers</h2>
+      <a href="{% url 'shop:product_list' %}?all=1" class="sbcb-view-all">Xem tất cả →</a>
+    </div>
+    <div class="row g-3">
+      {% for product in products|slice:":8" %}
+      <div class="col-6 col-sm-4 col-md-3 col-lg-3">
+        <div class="sbcb-product-card">
+          {% if product.compare_price %}
+          <span class="sbcb-badge-sale">
+            {% if product.discount_percent %}-{{ product.discount_percent }}%{% else %}SALE{% endif %}
+          </span>
+          {% endif %}
+          <a href="{{ product.get_absolute_url }}" class="sbcb-prod-img-link">
+            {% if product.image_url %}
+              <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy" class="sbcb-prod-img">
+            {% else %}
+              <div class="sbcb-prod-img-placeholder">
+                {% if 'thoại' in product.category.name|lower or 'thoai' in product.category.name|lower %}📱
+                {% elif 'laptop' in product.category.name|lower %}💻
+                {% elif 'tai' in product.category.name|lower %}🎧
+                {% elif 'sạc' in product.category.name|lower or 'phụ' in product.category.name|lower %}🔌
+                {% elif 'đồng' in product.category.name|lower %}⌚
+                {% else %}📦{% endif %}
+              </div>
+            {% endif %}
+          </a>
+          <div class="sbcb-prod-info">
+            <a href="{{ product.get_absolute_url }}" class="sbcb-prod-name">{{ product.name }}</a>
+            <div class="sbcb-prod-stars">★★★★★ <span class="sbcb-review-count">({{ product.id }})</span></div>
+            <div class="sbcb-prod-prices">
+              <span class="sbcb-price-main">{{ product.price|vnd }}đ</span>
+              {% if product.compare_price %}
+              <span class="sbcb-price-old">{{ product.compare_price|vnd }}đ</span>
+              {% endif %}
+            </div>
+            <a href="{{ product.get_absolute_url }}" class="sbcb-btn-cart">🛒 Thêm vào giỏ</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12 text-center text-muted py-4">Chưa có sản phẩm nào.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+
 <!-- DANH SÁCH / TÌM KIẾM -->
 
-{% if category or query %}
+{% if category or query or show_all %}
 
 <div class="row g-4 mb-5">
 
@@ -349,14 +447,19 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
         <div class="fpt-category-sidebar h-auto">
 
             <div class="sidebar-heading">
-                📦 DANH MỤC SẢN PHẨM
+                DANH MỤC SẢN PHẨM
             </div>
 
 
-            <a href="{% url 'shop:product_list' %}"
+            <a href="{% url 'shop:product_list' %}?all=1"
                class="fpt-cat-item {% if not category %}active{% endif %}">
 
-                <span>📱 Tất cả sản phẩm</span>
+                <span class="fpt-cat-label">
+                    {% if all_products_image %}
+                        <img class="fpt-cat-thumb" src="{{ all_products_image }}" alt="">
+                    {% endif %}
+                    Tất cả sản phẩm
+                </span>
 
                 <span class="chevron">›</span>
 
@@ -368,28 +471,9 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
             <a href="{{ c.get_absolute_url }}"
                class="fpt-cat-item {% if category.id == c.id %}active{% endif %}">
 
-                <span>
-
-                    <span class="cat-icon">
-
-                        {% if 'thoại' in c.name|lower or 'thoai' in c.name|lower or 'phone' in c.name|lower %}
-                            📱
-                        {% elif 'laptop' in c.name|lower %}
-                            💻
-                        {% elif 'tai nghe' in c.name|lower or 'nghe' in c.name|lower or 'airpod' in c.name|lower %}
-                            🎧
-                        {% elif 'sạc' in c.name|lower or 'phụ' in c.name|lower or 'sac' in c.name|lower %}
-                            🔌
-                        {% elif 'đồng hồ' in c.name|lower or 'đồng' in c.name|lower or 'watch' in c.name|lower %}
-                            ⌚
-                        {% else %}
-                            📦
-                        {% endif %}
-
-                    </span>
-
+                <span class="fpt-cat-label">
+                    <img class="fpt-cat-thumb" src="{{ c.display_image }}" alt="">
                     {{ c.name }}
-
                 </span>
 
                 <span class="chevron">›</span>
@@ -427,7 +511,7 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
 
             <div class="fpt-brand-chips">
 
-                <a href="{% url 'shop:product_list' %}"
+                <a href="{% url 'shop:product_list' %}?all=1"
                    class="brand-chip {% if not query and not category %}active{% endif %}">
                     Tất cả
                 </a>
@@ -626,7 +710,7 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
                         Hãy thử tìm kiếm với từ khóa khác.
                     </p>
 
-                    <a href="{% url 'shop:product_list' %}"
+                    <a href="{% url 'shop:product_list' %}?all=1"
                        class="btn btn-fpt-buy mt-2 px-4 py-2">
                         Quay lại danh mục
                     </a>
@@ -665,7 +749,7 @@ SBCB Shop - Điện thoại, Laptop, Phụ kiện
 
         <div class="fpt-brand-chips">
 
-            <a href="{% url 'shop:product_list' %}"
+            <a href="{% url 'shop:product_list' %}?all=1"
                class="brand-chip active">
                 Tất cả
             </a>

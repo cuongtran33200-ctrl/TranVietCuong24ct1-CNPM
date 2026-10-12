@@ -6,8 +6,9 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.templatetags.static import static
 from django.views.decorators.http import require_POST
 
 from .cart import Cart
@@ -27,14 +28,75 @@ def build_qr_data_uri(amount, order_id=None):
 
 def product_list(request, category_slug=None):
     category = None
-    categories = Category.objects.all()
+    image_products = Product.objects.filter(
+        is_active=True,
+        image__isnull=False,
+    ).exclude(image="")
+    categories = Category.objects.prefetch_related(
+        Prefetch(
+            "products",
+            queryset=image_products.order_by("-created_at"),
+            to_attr="image_products",
+        )
+    )
+    categories = list(categories)
     products = Product.objects.filter(is_active=True)
+    featured_image_product = image_products.order_by("-created_at").first()
+    all_products_image = (
+        featured_image_product.image_url
+        if featured_image_product
+        else static("shop/img/products/iphone16-pro.jpg")
+    )
+    category_image_fallbacks = (
+        ("samsung", "shop/img/categories/cat-samsung.jpg"),
+        ("thoại", "shop/img/categories/cat-dienthoai.jpg"),
+        ("thoai", "shop/img/categories/cat-dienthoai.jpg"),
+        ("phone", "shop/img/categories/cat-dienthoai.jpg"),
+        ("laptop", "shop/img/categories/cat-laptop.webp"),
+        ("tai nghe", "shop/img/products/sony-headphone.jpg"),
+        ("headphone", "shop/img/products/sony-headphone.jpg"),
+        ("nghe", "shop/img/products/sony-headphone.jpg"),
+        ("sạc", "shop/img/categories/cat-sac.webp"),
+        ("sac", "shop/img/categories/cat-sac.webp"),
+        ("đồng hồ", "shop/img/categories/cat-dongho.webp"),
+        ("dong ho", "shop/img/categories/cat-dongho.webp"),
+        ("watch", "shop/img/categories/cat-dongho.webp"),
+    )
+    for item in categories:
+        category_name = item.name.casefold()
+        category_image = (
+            item.image_products[0].image_url if item.image_products else ""
+        )
+        if not category_image:
+            fallback_path = next(
+                (
+                    path
+                    for keyword, path in category_image_fallbacks
+                    if keyword in category_name
+                ),
+                None,
+            )
+            category_image = (
+                static(fallback_path) if fallback_path else all_products_image
+            )
+        item.display_image = category_image
+
+    apple_image_product = image_products.filter(
+        Q(name__icontains="Apple")
+        | Q(name__icontains="iPhone")
+        | Q(name__icontains="MacBook")
+        | Q(name__icontains="iPad")
+    ).first()
+    samsung_image_product = image_products.filter(
+        Q(name__icontains="Samsung") | Q(name__icontains="Galaxy")
+    ).first()
 
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
 
     query = request.GET.get("q", "").strip()
+    show_all = request.GET.get("all") == "1"
     if query:
         products = products.filter(
             Q(name__icontains=query)
@@ -48,6 +110,18 @@ def product_list(request, category_slug=None):
         "categories": categories,
         "products": products,
         "query": query or "",
+        "show_all": show_all,
+        "all_products_image": all_products_image,
+        "apple_image": (
+            apple_image_product.image_url
+            if apple_image_product
+            else static("shop/img/products/iphone16-pro.jpg")
+        ),
+        "samsung_image": (
+            samsung_image_product.image_url
+            if samsung_image_product
+            else static("shop/img/categories/cat-samsung.jpg")
+        ),
     }
     return render(request, "shop/product_list.html", context)
 
