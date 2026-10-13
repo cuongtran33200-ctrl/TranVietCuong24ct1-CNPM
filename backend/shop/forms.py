@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
@@ -45,16 +46,6 @@ class RegisterForm(UserCreationForm):
             "và không quá giống thông tin tài khoản."
         )
 
-    def clean_username(self):
-        username = self.cleaned_data["username"].strip()
-        if not username:
-            raise forms.ValidationError("Vui lòng nhập tên đăng nhập.")
-        if User.objects.filter(username__iexact=username).exists():
-            raise forms.ValidationError(
-                "Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác."
-            )
-        return username
-
     def clean_email(self):
         email = self.cleaned_data["email"].strip()
         if User.objects.filter(email__iexact=email).exists():
@@ -64,22 +55,42 @@ class RegisterForm(UserCreationForm):
         return email
 
 
+
 class LoginForm(AuthenticationForm):
     error_messages = {
-        "invalid_login": "Tên đăng nhập hoặc mật khẩu không đúng.",
+        "invalid_login": "Email hoặc mật khẩu không đúng.",
         "inactive": "Tài khoản này hiện không hoạt động.",
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].label = "Tên đăng nhập"
-        self.fields["username"].widget.attrs.update(
-            {"class": "form-control", "placeholder": "Nhập tên đăng nhập"}
+        self.fields["username"] = forms.EmailField(
+            label="Gmail / Email",
+            widget=forms.EmailInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Nhập địa chỉ Gmail hoặc email",
+                    "autocomplete": "email",
+                    "inputmode": "email",
+                    "autofocus": True,
+                }
+            ),
         )
         self.fields["password"].label = "Mật khẩu"
         self.fields["password"].widget.attrs.update(
             {"class": "form-control", "placeholder": "Nhập mật khẩu"}
         )
+
+    def clean_username(self):
+        email = self.cleaned_data["username"].strip()
+        user_model = get_user_model()
+        try:
+            user = user_model._default_manager.get(email__iexact=email)
+        except user_model.DoesNotExist:
+            raise forms.ValidationError(self.error_messages["invalid_login"])
+        except user_model.MultipleObjectsReturned:
+            raise forms.ValidationError(self.error_messages["invalid_login"])
+        return user.get_username()
 
 
 class AddToCartForm(forms.Form):

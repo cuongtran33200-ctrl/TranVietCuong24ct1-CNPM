@@ -172,103 +172,65 @@ class PermissionTests(TestCase):
         self.assertEqual(self.order.status, Order.STATUS_CONFIRMED)
 
 
+REGISTER_DATA = {
+    "username": "new_user",
+    "email": "new@example.com",
+    "password1": "StrongPass!938",
+    "password2": "StrongPass!938",
+}
+
+
 class RegisterFormTests(TestCase):
     def test_username_is_trimmed_before_validation(self):
-        form = RegisterForm(
-            data={
-                "username": "  new_user  ",
-                "email": "new@example.com",
-                "password1": "StrongPass!938",
-                "password2": "StrongPass!938",
-            }
-        )
+        data = dict(REGISTER_DATA, username="  new_user  ")
+        form = RegisterForm(data=data)
 
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(form.cleaned_data["username"], "new_user")
 
+    def test_password_confirmation_must_match(self):
+        data = dict(REGISTER_DATA, password2="DifferentPass!77")
+        form = RegisterForm(data=data)
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("password2", form.errors)
+
     def test_successful_registration_creates_user_and_logs_in(self):
-        response = self.client.post(
-            reverse("shop:register"),
-            {
-                "username": "new_user",
-                "email": "new@example.com",
-                "password1": "StrongPass!938",
-                "password2": "StrongPass!938",
-            },
-        )
+        response = self.client.post(reverse("shop:register"), REGISTER_DATA)
 
         self.assertRedirects(response, reverse("shop:product_list"))
         user = User.objects.get(username="new_user")
         self.assertEqual(int(self.client.session["_auth_user_id"]), user.pk)
 
-    def test_registration_view_shows_duplicate_username_error(self):
+    def test_registration_with_existing_username_hits_database_constraint(self):
+        # Form không còn tự kiểm tra trùng; database (UNIQUE) vẫn chặn lưu trùng
+        # và view hiển thị lỗi thân thiện thay vì tạo tài khoản thứ hai.
         User.objects.create_user(
-            username="existing",
-            email="existing@example.com",
-            password="ValidPass123!",
+            username="new_user", email="old@example.com", password="ValidPass123!"
         )
 
-        response = self.client.post(
-            reverse("shop:register"),
-            {
-                "username": "Existing",
-                "email": "other@example.com",
-                "password1": "StrongPass!938",
-                "password2": "StrongPass!938",
-            },
-        )
+        response = self.client.post(reverse("shop:register"), REGISTER_DATA)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            "Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác.",
-        )
-        self.assertEqual(User.objects.filter(username__iexact="existing").count(), 1)
-
-    def test_duplicate_username_is_rejected_case_insensitively(self):
-        User.objects.create_user(
-            username="cuong",
-            email="cuong@example.com",
-            password="ValidPass123!",
-        )
-        form = RegisterForm(
-            data={
-                "username": "Cuong",
-                "email": "other@example.com",
-                "password1": "AnotherPass123!",
-                "password2": "AnotherPass123!",
-            }
-        )
-
-        self.assertFalse(form.is_valid())
-        self.assertIn(
-            "Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác.",
-            form.errors["username"],
-        )
-
-    def test_duplicate_email_is_rejected_case_insensitively(self):
-        User.objects.create_user(
-            username="cuong",
-            email="cuong@example.com",
-            password="ValidPass123!",
-        )
-        form = RegisterForm(
-            data={
-                "username": "another",
-                "email": "CUONG@example.com",
-                "password1": "AnotherPass123!",
-                "password2": "AnotherPass123!",
-            }
-        )
-
-        self.assertFalse(form.is_valid())
-        self.assertIn(
-            "Email này đã được sử dụng. Vui lòng nhập email khác.",
-            form.errors["email"],
-        )
+        self.assertEqual(User.objects.filter(username="new_user").count(), 1)
 
 
 class LoginViewTests(TestCase):
+    def test_user_can_log_in_with_email(self):
+        user = User.objects.create_user(
+            username="cuong",
+            email="cuong@example.com",
+            password="StrongPass!938",
+        )
+
+        response = self.client.post(
+            reverse("shop:login"),
+            {"username": "CUONG@example.com", "password": "StrongPass!938"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(int(self.client.session["_auth_user_id"]), user.pk)
+
     def test_invalid_credentials_show_vietnamese_error(self):
         User.objects.create_user(
             username="cuong",
@@ -278,11 +240,11 @@ class LoginViewTests(TestCase):
 
         response = self.client.post(
             reverse("shop:login"),
-            {"username": "cuong", "password": "wrong-password"},
+            {"username": "cuong@example.com", "password": "wrong-password"},
         )
 
         self.assertContains(
-            response, "Tên đăng nhập hoặc mật khẩu không đúng."
+            response, "Email hoặc mật khẩu không đúng."
         )
 
 
@@ -439,4 +401,3 @@ class SupportAndOrderHistoryTests(TestCase):
 
         self.assertEqual(len(response.context["orders"]), 1)
         self.assertEqual(response.context["orders"][0].user, self.user)
-
