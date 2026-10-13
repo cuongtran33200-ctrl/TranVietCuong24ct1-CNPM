@@ -60,7 +60,13 @@
             <div class="fpt-detail-meta">
                 <span>Danh mục: <strong class="text-dark">{{ product.category.name }}</strong></span>
                 <span>|</span>
-                <span>Đánh giá: <strong class="text-warning">★★★★★</strong> ({{ reviews|length }} đánh giá)</span>
+                <span>Đánh giá:
+                    {% if product.average_rating %}
+                        <strong class="text-warning">{{ product.average_rating }}/5</strong> ({{ reviews|length }} đánh giá)
+                    {% else %}
+                        <span class="text-muted">Chưa có đánh giá</span>
+                    {% endif %}
+                </span>
                 <span>|</span>
                 <span>Tình trạng:
                     {% if product.in_stock %}
@@ -82,39 +88,9 @@
                 {% endif %}
             </div>
 
-            <!-- Phiên bản bộ nhớ / Màu sắc mẫu -->
-            <div class="mb-3">
-                <label class="form-label fw-bold small text-muted text-uppercase mb-1">Tuỳ chọn phiên bản:</label>
-                <div class="d-flex gap-2 flex-wrap">
-                    <button type="button" class="btn btn-sm btn-outline-danger active fw-semibold px-3 py-1">Tiêu chuẩn</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold px-3 py-1">Nâng cấp RAM</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold px-3 py-1">Bản Pro Max</button>
-                </div>
-            </div>
-
-            <!-- Khung Khuyến Mãi Đặc Quyền SBCB Shop -->
-            <div class="fpt-promo-box">
-                <div class="promo-header">
-                    <span><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4"/><rect x="5" y="12" width="14" height="9"/><path d="M12 8v13"/></svg> KHUYẾN MÃI ĐẶC QUYỀN SBCB SHOP</span>
-                </div>
-                <div class="promo-body">
-                    <div class="promo-item">
-                        <span class="promo-badge">KM 1</span>
-                        <span>Quét mã QR để xem đúng số tiền của đơn hàng.</span>
-                    </div>
-                    <div class="promo-item">
-                        <span class="promo-badge">KM 2</span>
-                        <span>Tặng gói <strong>Bảo hiểm rơi vỡ vào nước 12 tháng</strong> trị giá 1.500.000₫.</span>
-                    </div>
-                    <div class="promo-item">
-                        <span class="promo-badge">KM 3</span>
-                        <span>Thu cũ đổi mới - <strong>Trợ giá thêm đến 3.000.000₫</strong> khi lên đời điện thoại, laptop.</span>
-                    </div>
-                    <div class="promo-item">
-                        <span class="promo-badge">KM 4</span>
-                        <span>Giảm ngay <strong>30%</strong> khi mua kèm combo phụ kiện sạc dự phòng, ốp lưng, tai nghe.</span>
-                    </div>
-                </div>
+            <!-- Thanh toán bằng QR: chỉ hiển thị số tiền, không có khuyến mãi cố định -->
+            <div class="alert alert-light border small mb-3">
+                Thanh toán bằng mã QR khi đặt hàng. Nhân viên sẽ liên hệ xác nhận đơn.
             </div>
 
             <!-- Nút mua hàng / Form thêm vào giỏ -->

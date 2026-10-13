@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from .forms import RegisterForm
-from .models import Category, Order, OrderItem, Product, Profile
+from .models import Category, Order, OrderItem, Product, Profile, Review, SupportRequest
 
 CHECKOUT_DATA = {
     "full_name": "Khách Test",
@@ -305,3 +305,138 @@ class ProductListTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Tất cả sản phẩm")
         self.assertNotContains(response, "Danh Mục Phổ Biến")
+
+
+class CartTests(TestCase):
+    def setUp(self):
+        category = Category.objects.create(name="Tai nghe", slug="tai-nghe")
+        self.product = Product.objects.create(
+            category=category, name="Sony Test", slug="sony-test", price=300, stock=5
+        )
+
+    def test_add_product_to_cart_accumulates_quantity(self):
+        self.client.post(reverse("shop:cart_add", args=[self.product.id]), {"quantity": 2})
+        self.client.post(reverse("shop:cart_add", args=[self.product.id]), {"quantity": 1})
+
+        self.assertEqual(self.client.session["cart"][str(self.product.id)]["quantity"], 3)
+
+    def test_update_quantity_overrides_previous_value(self):
+        self.client.post(reverse("shop:cart_add", args=[self.product.id]), {"quantity": 2})
+        self.client.post(reverse("shop:cart_update", args=[self.product.id]), {"quantity": 4})
+
+        self.assertEqual(self.client.session["cart"][str(self.product.id)]["quantity"], 4)
+
+    def test_update_quantity_zero_removes_item(self):
+        self.client.post(reverse("shop:cart_add", args=[self.product.id]), {"quantity": 2})
+        self.client.post(reverse("shop:cart_update", args=[self.product.id]), {"quantity": 0})
+
+        self.assertNotIn(str(self.product.id), self.client.session["cart"])
+
+    def test_remove_product_from_cart(self):
+        self.client.post(reverse("shop:cart_add", args=[self.product.id]), {"quantity": 1})
+        self.client.post(reverse("shop:cart_remove", args=[self.product.id]))
+
+        self.assertNotIn(str(self.product.id), self.client.session["cart"])
+
+    def test_cart_add_rejects_get_requests(self):
+        response = self.client.get(reverse("shop:cart_add", args=[self.product.id]))
+
+        self.assertEqual(response.status_code, 405)
+
+
+class ReviewTests(TestCase):
+    def setUp(self):
+        self.buyer = User.objects.create_user(
+            username="buyer2", email="b2@example.com", password="ValidPass123!"
+        )
+        self.stranger = User.objects.create_user(
+            username="stranger", email="s@example.com", password="ValidPass123!"
+        )
+        category = Category.objects.create(name="Laptop 2", slug="laptop-2")
+        self.product = Product.objects.create(
+            category=category, name="Asus Test", slug="asus-test", price=900, stock=5
+        )
+        order = Order.objects.create(
+            user=self.buyer, full_name="Buyer", phone="0922222222", address="3 Street"
+        )
+        OrderItem.objects.create(order=order, product=self.product, price=900, quantity=1)
+
+    def _review_url(self):
+        return reverse("shop:add_review", args=[self.product.slug])
+
+    def test_buyer_can_review_only_once(self):
+        self.client.force_login(self.buyer)
+
+        self.client.post(self._review_url(), {"rating": 5, "comment": "Tốt"})
+        self.client.post(self._review_url(), {"rating": 1, "comment": "Thử lại"})
+
+        reviews = Review.objects.filter(product=self.product, user=self.buyer)
+        self.assertEqual(reviews.count(), 1)
+        self.assertEqual(reviews.get().rating, 5)
+
+    def test_user_without_purchase_cannot_review(self):
+        self.client.force_login(self.stranger)
+
+        self.client.post(self._review_url(), {"rating": 5, "comment": "Không mua"})
+
+        self.assertFalse(Review.objects.filter(user=self.stranger).exists())
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        response = self.client.post(self._review_url(), {"rating": 5})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("shop:login"), response["Location"])
+
+    def test_invalid_rating_is_not_saved(self):
+        self.client.force_login(self.buyer)
+
+        self.client.post(self._review_url(), {"rating": 9, "comment": "Sai"})
+
+        self.assertFalse(Review.objects.filter(user=self.buyer).exists())
+
+
+class SupportAndOrderHistoryTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="helpme", email="h@example.com", password="ValidPass123!"
+        )
+        self.other = User.objects.create_user(
+            username="other3", email="o3@example.com", password="ValidPass123!"
+        )
+
+    def test_customer_can_create_support_request(self):
+        self.client.force_login(self.user)
+
+        self.client.post(
+            reverse("shop:support_list"),
+            {"subject": "Lỗi sạc", "message": "Sạc không vào điện"},
+        )
+
+        request = SupportRequest.objects.get()
+        self.assertEqual(request.user, self.user)
+        self.assertEqual(request.status, SupportRequest.STATUS_OPEN)
+
+    def test_support_page_lists_only_own_requests(self):
+        SupportRequest.objects.create(user=self.other, subject="Của người khác", message="x")
+        SupportRequest.objects.create(user=self.user, subject="Của tôi", message="y")
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("shop:support_list"))
+
+        self.assertContains(response, "Của tôi")
+        self.assertNotContains(response, "Của người khác")
+
+    def test_order_history_shows_only_own_orders(self):
+        Order.objects.create(
+            user=self.other, full_name="Người khác", phone="0933333333", address="4 Street"
+        )
+        Order.objects.create(
+            user=self.user, full_name="Tôi", phone="0944444444", address="5 Street"
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("shop:order_history"))
+
+        self.assertEqual(len(response.context["orders"]), 1)
+        self.assertEqual(response.context["orders"][0].user, self.user)
+
