@@ -173,53 +173,56 @@ class PermissionTests(TestCase):
 
 
 REGISTER_DATA = {
+    "username": "new_user",
     "email": "new@example.com",
     "password1": "123456",
+    "password2": "123456",
 }
 
 
 class RegisterFormTests(TestCase):
-    def test_form_only_has_email_and_password(self):
+    def test_form_has_username_email_and_passwords(self):
         form = RegisterForm()
-        self.assertEqual(set(form.fields.keys()), {"email", "password1"})
+        self.assertEqual(set(form.fields.keys()), {"username", "email", "password1", "password2"})
 
     def test_short_password_is_accepted(self):
-        form = RegisterForm(data={"email": "short@example.com", "password1": "123456"})
+        form = RegisterForm(data={
+            "username": "short", "email": "short@example.com",
+            "password1": "123456", "password2": "123456",
+        })
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_password_too_short_is_rejected(self):
-        form = RegisterForm(data={"email": "short2@example.com", "password1": "12345"})
+        form = RegisterForm(data={
+            "username": "short2", "email": "short2@example.com",
+            "password1": "12345", "password2": "12345",
+        })
         self.assertFalse(form.is_valid())
         self.assertIn("password1", form.errors)
+
+    def test_password_mismatch_is_rejected(self):
+        form = RegisterForm(data={
+            "username": "mismatch", "email": "mismatch@example.com",
+            "password1": "123456", "password2": "654321",
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn("password2", form.errors)
 
     def test_duplicate_email_is_rejected(self):
         User.objects.create_user(
             username="existing", email="dup@example.com", password="ValidPass123!"
         )
-        form = RegisterForm(data={"email": "DUP@example.com", "password1": "123456"})
+        form = RegisterForm(data={
+            "username": "newone", "email": "DUP@example.com",
+            "password1": "123456", "password2": "123456",
+        })
         self.assertFalse(form.is_valid())
         self.assertIn("email", form.errors)
-
-    def test_username_auto_generated_from_email(self):
-        form = RegisterForm(data={"email": "nguyenvanan@gmail.com", "password1": "123456"})
-        self.assertTrue(form.is_valid(), form.errors)
-        user = form.save()
-        self.assertEqual(user.username, "nguyenvanan")
-        self.assertEqual(user.email, "nguyenvanan@gmail.com")
-
-    def test_username_suffix_added_on_conflict(self):
-        User.objects.create_user(
-            username="nguyenvanan", email="old@gmail.com", password="ValidPass123!"
-        )
-        form = RegisterForm(data={"email": "nguyenvanan2@gmail.com", "password1": "123456"})
-        self.assertTrue(form.is_valid(), form.errors)
-        user = form.save()
-        self.assertEqual(user.username, "nguyenvanan2")
 
     def test_successful_registration_creates_user_and_logs_in(self):
         response = self.client.post(reverse("shop:register"), REGISTER_DATA)
         self.assertRedirects(response, reverse("shop:product_list"))
-        user = User.objects.get(email="new@example.com")
+        user = User.objects.get(username="new_user")
         self.assertEqual(int(self.client.session["_auth_user_id"]), user.pk)
 
 
