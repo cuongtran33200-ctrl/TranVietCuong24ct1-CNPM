@@ -173,46 +173,54 @@ class PermissionTests(TestCase):
 
 
 REGISTER_DATA = {
-    "username": "new_user",
     "email": "new@example.com",
-    "password1": "StrongPass!938",
-    "password2": "StrongPass!938",
+    "password1": "123456",
 }
 
 
 class RegisterFormTests(TestCase):
-    def test_username_is_trimmed_before_validation(self):
-        data = dict(REGISTER_DATA, username="  new_user  ")
-        form = RegisterForm(data=data)
+    def test_form_only_has_email_and_password(self):
+        form = RegisterForm()
+        self.assertEqual(set(form.fields.keys()), {"email", "password1"})
 
+    def test_short_password_is_accepted(self):
+        form = RegisterForm(data={"email": "short@example.com", "password1": "123456"})
         self.assertTrue(form.is_valid(), form.errors)
-        self.assertEqual(form.cleaned_data["username"], "new_user")
 
-    def test_password_confirmation_must_match(self):
-        data = dict(REGISTER_DATA, password2="DifferentPass!77")
-        form = RegisterForm(data=data)
-
+    def test_password_too_short_is_rejected(self):
+        form = RegisterForm(data={"email": "short2@example.com", "password1": "12345"})
         self.assertFalse(form.is_valid())
-        self.assertIn("password2", form.errors)
+        self.assertIn("password1", form.errors)
+
+    def test_duplicate_email_is_rejected(self):
+        User.objects.create_user(
+            username="existing", email="dup@example.com", password="ValidPass123!"
+        )
+        form = RegisterForm(data={"email": "DUP@example.com", "password1": "123456"})
+        self.assertFalse(form.is_valid())
+        self.assertIn("email", form.errors)
+
+    def test_username_auto_generated_from_email(self):
+        form = RegisterForm(data={"email": "nguyenvanan@gmail.com", "password1": "123456"})
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        self.assertEqual(user.username, "nguyenvanan")
+        self.assertEqual(user.email, "nguyenvanan@gmail.com")
+
+    def test_username_suffix_added_on_conflict(self):
+        User.objects.create_user(
+            username="nguyenvanan", email="old@gmail.com", password="ValidPass123!"
+        )
+        form = RegisterForm(data={"email": "nguyenvanan2@gmail.com", "password1": "123456"})
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        self.assertEqual(user.username, "nguyenvanan2")
 
     def test_successful_registration_creates_user_and_logs_in(self):
         response = self.client.post(reverse("shop:register"), REGISTER_DATA)
-
         self.assertRedirects(response, reverse("shop:product_list"))
-        user = User.objects.get(username="new_user")
+        user = User.objects.get(email="new@example.com")
         self.assertEqual(int(self.client.session["_auth_user_id"]), user.pk)
-
-    def test_registration_with_existing_username_hits_database_constraint(self):
-        # Form không còn tự kiểm tra trùng; database (UNIQUE) vẫn chặn lưu trùng
-        # và view hiển thị lỗi thân thiện thay vì tạo tài khoản thứ hai.
-        User.objects.create_user(
-            username="new_user", email="old@example.com", password="ValidPass123!"
-        )
-
-        response = self.client.post(reverse("shop:register"), REGISTER_DATA)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(User.objects.filter(username="new_user").count(), 1)
 
 
 class LoginViewTests(TestCase):

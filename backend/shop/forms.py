@@ -1,9 +1,14 @@
+import re
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 
 from .models import Order, Profile, Review, SupportRequest
+
+User = get_user_model()
 
 
 class RegisterForm(UserCreationForm):
@@ -11,40 +16,29 @@ class RegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ["username", "email", "password1", "password2"]
+        fields = ["email", "password1"]
+        # username không nằm trong fields: tự sinh từ email trong save()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # UserCreationForm tự thêm password2; chỉ cần nhập mật khẩu một lần.
+        if "password2" in self.fields:
+            del self.fields["password2"]
         for field in self.fields.values():
             field.widget.attrs["class"] = "form-control"
-        self.fields["username"].label = "Tên đăng nhập"
-        self.fields["username"].widget.attrs.update(
-            {
-                "placeholder": "Nhập tên đăng nhập",
-                "autofocus": True,
-                "autocomplete": "username",
-                "maxlength": 150,
-            }
-        )
         self.fields["email"].widget.attrs.update(
             {
                 "placeholder": "Nhập địa chỉ Gmail hoặc email",
                 "autocomplete": "email",
                 "inputmode": "email",
+                "autofocus": True,
             }
         )
         self.fields["password1"].label = "Mật khẩu"
         self.fields["password1"].widget.attrs.update(
-            {"placeholder": "Nhập mật khẩu", "autocomplete": "new-password"}
+            {"placeholder": "Nhập mật khẩu (tối thiểu 6 ký tự)", "autocomplete": "new-password"}
         )
-        self.fields["password2"].label = "Nhập lại mật khẩu"
-        self.fields["password2"].widget.attrs.update(
-            {"placeholder": "Nhập lại mật khẩu", "autocomplete": "new-password"}
-        )
-        self.fields["password1"].help_text = (
-            "Mật khẩu cần ít nhất 8 ký tự, không quá phổ biến, không chỉ gồm số "
-            "và không quá giống thông tin tài khoản."
-        )
+        self.fields["password1"].help_text = "Mật khẩu cần ít nhất 6 ký tự."
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip()
@@ -53,6 +47,31 @@ class RegisterForm(UserCreationForm):
                 "Email này đã được sử dụng. Vui lòng nhập email khác."
             )
         return email
+
+    def clean_password1(self):
+        password = self.cleaned_data.get("password1")
+        if password:
+            validate_password(password)
+        return password
+
+    def _generate_username(self, email):
+        """Sinh username từ phần trước @ của email, thêm số nếu trùng."""
+        base = re.sub(r"[^a-zA-Z0-9]", "", email.split("@")[0]).lower()[:140] or "user"
+        candidate = base
+        n = 1
+        while User.objects.filter(username__iexact=candidate).exists():
+            n += 1
+            candidate = f"{base}{n}"
+        return candidate
+
+    def save(self, commit=True):
+        email = self.cleaned_data["email"].strip()
+        username = self._generate_username(email)
+        user = User(username=username, email=email)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
 
 
 
